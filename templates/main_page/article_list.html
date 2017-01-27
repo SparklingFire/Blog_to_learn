@@ -1,0 +1,38 @@
+{% extends 'main_page/static_templates/main_page_carcass.html' %}
+
+{% block content %}
+    {% if object_list %}
+     {% for article in object_list %}
+         <div class="panel panel-default">
+             <div class="panel-heading">
+                 <h3>{{ article.title }}</h3>
+                 <p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> {{ article.get_hits }} {{ article.created }} от {{ article.author }}</p>
+             </div>
+             <div class="panel-body">
+                 {{ article.text }}
+             </div>
+             <div class="panel-footer">
+                 <a href="/article/{{ article.pk }}">Далее</a>
+             </div>
+         </div>
+     {% endfor %}
+        {% else %}
+        <h1>Совпадений не найдено</h1>
+    {% endif %}
+
+      <div class="pagination">
+      {% if is_paginated %}
+            <span class="page-links">
+                {% if page_obj.has_previous %}
+                    <a href="/?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="page-current">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                </span>
+                {% if page_obj.has_next %}
+                    <a href="/?page={{ page_obj.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+    {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,41 @@
+html, body{
+    overflow-y: scroll;
+}
+
+body{
+    font-family: 'Garamond';
+    font-size: large;
+    background-color: #EDEDED;
+}
+
+.panel-default .panel-heading{
+    background-color: white;
+
+}
+
+.panel-default .panel-footer{
+    background-color: white;
+    border-color: white;
+}
+
+.panel-default{
+    border-radius: 0px;
+}
+
+.panel-default .panel-heading h3,
+.panel-default .panel-heading h1{
+    text-align: center;
+}
+
+#answer-form{
+    text-align: center;
+}
+
+.sidebar-tag{
+    border: none;
+    border-radius: 0;
+    color: black;
+    background-color: #EDEDED;
+    margin-top: 3px;
+    margin-left: 0;
+}

@@ -1,0 +1,72 @@
+{% extends 'main_page/static_templates/main_page_carcass.html' %}
+
+
+{% block content %}
+    <div class="panel panel-default article-details" id='article' data-id='{{ article.get_rating_model_pk }}' data-obj='{{ article.primary_key }}'>
+        <div class="panel-heading">
+            <h1>{{ article.title }}</h1>
+        </div>
+
+        <div class="panel-body">
+            <h4> {{ article.text }}</h4>
+        </div>
+
+        <div class="panel-footer">
+            <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> {{ article.get_hits }}
+                    <a href="/rate/{{ article.get_rating_model_pk}}/like/">
+                        <span class="glyphicon glyphicon-thumbs-up like" data-grade="like"></span></a>
+                    <span class="total-likes">{{ article.get_likes }}</span>
+                    <a href="/rate/{{article.get_rating_model_pk}}/dislike/">
+                        <span class="glyphicon glyphicon-thumbs-down like" data-grade="dislike"></span></a>
+                    <span class="total-dislikes">{{ article.get_dislikes }}</span>
+            <h4>Тэги: </h4>
+            <p>{% for tag in article.get_article_tags %}
+                    <a href="/filter/tag/{{ tag.tag }}"><button type="button" class="btn btn-primary btn-md sidebar-tag">{{ tag.tag }}</button></a>
+                {% endfor %}
+            </p>
+             <div class="subscribe">
+                {% if subscription %}
+                    <a href ="/subscribe/{{ article.primary_key }}">Отписаться</a>
+                {% else %}
+                    <a href="/subscribe/{{ article.primary_key }}">Подписаться</a>
+                {% endif %}
+                </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div id="comments-list">
+    <h3>Комментарии:</h3>
+        {% for comment in comments %}
+            <div class="panel panel-default article-details" data-id={{ comment.get_rating_model_pk }}>
+            <div class="panel-heading">
+                Аноним {{ comment.name }} {{ comment.created }}
+                {% if user.is_authenticated %}
+                <div class="delete-comment"><a href="/comment/delete/{{ comment.pk }}"><span class="glyphicon glyphicon-remove"></span></a> </div>
+                {% endif %}
+            </div>
+            <div class="panel-body">
+                <p>{{ comment.text }}</p>
+            </div>
+            <div class="panel-footer">
+                <a href="/rate/{{ comment.get_rating_model_pk}}/like/">
+                        <span class="glyphicon glyphicon-thumbs-up like" data-grade="like"></span></a>
+                    <span class="total-likes">{{ comment.get_likes }}</span>
+                    <a href="/rate/{{comment.get_rating_model_pk}}/dislike/">
+                        <span class="glyphicon glyphicon-thumbs-down like" data-grade="dislike"></span></a>
+                    <span class="total-dislikes">{{ comment.get_dislikes }}</span>
+            </div>
+            </div>
+
+        {% endfor %}
+    </div>
+
+    <div id="errors-list"></div>
+    <form action="" method="post" id="answer-form">
+    {% csrf_token %}
+    {{ form.text }}
+        <br>
+    <button type="submit" class="btn btn-primary btn-sm answer-submit">Ответить</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,45 @@
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Популярные темы</h4>
+    </div>
+    <div class="panel-body">
+        {% for article in POPULAR_ARTICLES %}
+            <p><small><span class="glyphicon glyphicon-chevron-right"></span></small>
+                <a href="{{ article.get_absolute_url }}">{{ article.title }}</a></p>
+        {% endfor %}
+    </div>
+    <div class="panel-footer">
+    </div>
+</div>
+
+<br>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Подписки</h4>
+    </div>
+    <div class="panel-body" id="subscription-list">
+        {% for sub in SUBSCRIPTION_LIST %}
+            <p class="subscription-delete" data-pk='{{ sub.pk }}'><a href="/delete_subscription/{{ sub.pk }}/"><span class="glyphicon glyphicon-remove">
+
+            </span></a><a href="{{ sub.article.get_absolute_url }}">{{ sub.article.title }}</a></p>
+        {% endfor %}
+    </div>
+    <div class="panel-footer">
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Тэги</h4>
+    </div>
+    <div class="panel-body">
+        {% for tag in TAGS %}
+             <a href="/filter/tag/{{ tag.tag }}"><button type="button" class="btn btn-primary btn-md sidebar-tag">{{ tag.tag }}</button></a>
+        {% endfor %}
+    </div>
+    <div class="panel-footer">
+    </div>
+</div>
