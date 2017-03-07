@@ -1,0 +1,27 @@
+.pagination li a{
+    color: black;
+    text-decoration: none;
+
+}
+
+.pagination li a:active,
+.pagination li a:hover,
+.pagination li.active{
+    background-color: orange;
+    color:white;
+}
+
+.pagination{
+  width: 240px;
+  margin: 0 auto;
+}
+
+.pagination li.active a,
+.pagination li.active a:hover,
+.pagination li.active a:active,
+.pagination li.active a:visited,
+.pagination li.active a:focus{
+    background-color: orange;
+    border-color: black;
+    cursor: pointer;
+}

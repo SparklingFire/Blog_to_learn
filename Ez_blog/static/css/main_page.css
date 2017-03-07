@@ -31,11 +31,60 @@ body{
     text-align: center;
 }
 
-.sidebar-tag{
+.navbar-inverse{
+    background-color: orange;
     border: none;
-    border-radius: 0;
+}
+
+.navbar-collapse .navbar-nav li a{
+    color: white;
+}
+
+.navbar-header .navbar-brand{
+    color: white;
+}
+
+.navbar-header .navbar-brand:hover,
+.sub-counter:hover,
+.navbar-nav li:hover{
+    background-color: #FFC01A;
+}
+
+.sidebar a,
+.article-details a{
     color: black;
-    background-color: #EDEDED;
-    margin-top: 3px;
-    margin-left: 0;
+    text-decoration: none;
+}
+
+.sidebar a:hover,
+.article-details a:hover{
+    color: orange;
+}
+
+.sub-counter{
+    cursor: pointer;
+}
+
+.sidebar .panel-heading{
+    border-radius: 0;
+    text-align: center;
+    background-color: orange;
+    color: white;
+    border: none;
+}
+
+.sidebar-tag{
+    background-color: white;
+    border-radius: 0;
+    border-color: black;
+    color: black;
+}
+
+.sidebar-tag:hover,
+.sidebar-tag:active,
+.sidebar-tag:visited,
+.sidebar-tag:focus,
+.sidebar-tag:active:focus{
+    background-color: orange;
+    color: white;
 }

@@ -6,12 +6,13 @@
          <div class="panel panel-default">
              <div class="panel-heading">
                  <h3>{{ article.title }}</h3>
-                 <p><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> {{ article.get_hits }} {{ article.created }} от {{ article.author }}</p>
+                 <p>Просмотры: {{ article.get_hits }}</p>
+                 <p class="author-info">{{ article.created }} от {{ article.author }}</p>
              </div>
              <div class="panel-body">
                  {{ article.text }}
              </div>
-             <div class="panel-footer">
+             <div class="panel-footer article-details">
                  <a href="/article/{{ article.pk }}">Далее</a>
              </div>
          </div>
@@ -20,19 +21,29 @@
         <h1>Совпадений не найдено</h1>
     {% endif %}
 
-      <div class="pagination">
-      {% if is_paginated %}
-            <span class="page-links">
-                {% if page_obj.has_previous %}
-                    <a href="/?page={{ page_obj.previous_page_number }}">previous</a>
-                {% endif %}
-                <span class="page-current">
-                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-                </span>
-                {% if page_obj.has_next %}
-                    <a href="/?page={{ page_obj.next_page_number }}">next</a>
-                {% endif %}
-            </span>
+{% if is_paginated %}
+    <div class="text-center">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">&laquo;</a></li>
     {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+      {% ifequal num page_obj.number %}
+        <li class="active"><a href="#">{{ num }}<span class="sr-only">(current)</span></a></li>
+      {% else %}
+        <li><a href="?page={{ num }}">{{ num }}</a></li>
+      {% endifequal %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="disabled"><a href="#">&raquo;</a></li>
+    {% endif %}
+  </ul>
     </div>
+{% endif %}
 {% endblock %}

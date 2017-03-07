@@ -11,6 +11,8 @@ from comments.models import Comment
 from utils_tags_cp.utils import get_ip
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+import pytz
 
 
 class ArticlesList(generic.ListView):
@@ -66,13 +68,34 @@ class ArticleDetails(generic.FormView):
 
     def form_valid(self, form):
         comment = form.save(commit=False)
+        parent = form['parent'].value()
+        if parent:
+            comment.parent = Comment.objects.get(pk=int(parent))
         comment.article = self.article
         comment.session = self.request.session.session_key
         comment.ip = get_ip(self.request)
         comment.save()
 
-        response = super().form_valid(form)
+        subscription_list = Subscription.objects.filter(article=self.article)
+        for sub in subscription_list:
+            sub.new_comments += 1
+            sub.total_comments += 1
+            sub.save()
 
+        if self.request.is_ajax():
+            data = {'rating_model_pk': comment.get_rating_model_pk(),
+                    'comment_text': comment.text,
+                    'comment_name': comment.name,
+                    'datetime': timezone.now(),
+                    'auth_user': False,
+                    'comment_pk': comment.id
+                    }
+
+            if self.request.user.is_authenticated():
+                data.update({'auth_user': True})
+
+            return JsonResponse(data)
+        response = super().form_valid(form)
         return response
 
     def dispatch(self, request, *args, **kwargs):
@@ -100,6 +123,14 @@ class ArticleDetails(generic.FormView):
         hit_models.Hit.objects.get_or_create(session=request.session.session_key,
                                              hitcount=hit_count_model,
                                              ip=get_ip(self.request))
+
+        try:
+            subscription = Subscription.objects.get(article=self.article, session=self.request.session.session_key)
+            subscription.new_comments = 0
+            subscription.checked_comments = subscription.total_comments
+            subscription.save()
+        except ObjectDoesNotExist:
+            pass
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -131,7 +162,8 @@ class SubscriptionManagement(generic.RedirectView):
                                            article=self.article)
             data.update({'sub_id': sub.pk})
             sub.delete()
-            data.update({'message': 'Подписаться'})
+            data.update({'message': 'Подписаться',
+                         'sub_counter': Subscription.objects.filter(session=request.session.session_key).count()})
 
         except ObjectDoesNotExist:
             sub = Subscription.objects.create(session=request.session.session_key,
@@ -139,8 +171,8 @@ class SubscriptionManagement(generic.RedirectView):
                                               article=self.article)
             data.update({'sub_id': sub.pk,
                          'message': 'Отписаться',
-                         'sub_url': self.article.get_absolute_url(),
-                         'article': self.article.title})
+                         'article': self.article.title,
+                         'sub_counter': Subscription.objects.filter(session=request.session.session_key).count()})
 
         if self.request.is_ajax():
             return JsonResponse(data)
@@ -148,19 +180,27 @@ class SubscriptionManagement(generic.RedirectView):
         return super().dispatch(request, *args, **kwargs)
 
 
+class SubscriptionRefresher(generic.RedirectView):
+    pass
+
+
 @login_required
 def delete_comment(request, pk):
     comment = Comment.objects.get(pk=pk)
     url = comment.article.get_absolute_url()
     comment.delete()
+    if request.is_ajax():
+        return JsonResponse({})
     return HttpResponseRedirect(url)
 
 
 def delete_subscription(request, pk):
     subscription = Subscription.objects.get(pk=pk)
     data = {'pk': subscription.article.primary_key,
-            'message': 'Подписаться'}
+            'message': 'Подписаться',
+            }
     subscription.delete()
+    data.update({'sub_counter': Subscription.objects.filter(session=request.session.session_key).count()})
 
     if request.is_ajax():
         return JsonResponse(data)

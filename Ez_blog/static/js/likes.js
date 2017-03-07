@@ -1,9 +1,9 @@
 $(document).ready(function () {
-  $('.like').on('click', function (e) {
+  $(document).on('click', '.like', function (e) {
       e.preventDefault();
-      var url = '/rate/' + $(this).closest('.article-details').data('id') + '/' + $(this).data('grade');
-      var likes = $(this).closest('.article-details').find('.total-likes');
-      var dislikes = $(this).closest('.article-details').find('.total-dislikes');
+      var url = $(this).parent().attr('href');
+      var likes = $(this).closest('.panel-footer').find('.total-likes');
+      var dislikes = $(this).closest('.panel-footer').find('.total-dislikes');
       $.ajax({type: 'GET',
               url: url,
               dataType: 'json',

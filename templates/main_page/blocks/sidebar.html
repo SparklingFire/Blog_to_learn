@@ -1,12 +1,12 @@
 
 
-<div class="panel panel-default">
+<div class="panel panel-default sidebar">
     <div class="panel-heading">
         <h4>Популярные темы</h4>
     </div>
     <div class="panel-body">
         {% for article in POPULAR_ARTICLES %}
-            <p><small><span class="glyphicon glyphicon-chevron-right"></span></small>
+            <p><small><span class="glyphicon glyphicon-exclamation-sign"></span></small>
                 <a href="{{ article.get_absolute_url }}">{{ article.title }}</a></p>
         {% endfor %}
     </div>
@@ -16,30 +16,31 @@
 
 <br>
 
-<div class="panel panel-default">
+<div class="panel panel-default sidebar">
     <div class="panel-heading">
-        <h4>Подписки</h4>
+        <h4>Тэги</h4>
     </div>
-    <div class="panel-body" id="subscription-list">
-        {% for sub in SUBSCRIPTION_LIST %}
-            <p class="subscription-delete" data-pk='{{ sub.pk }}'><a href="/delete_subscription/{{ sub.pk }}/"><span class="glyphicon glyphicon-remove">
-
-            </span></a><a href="{{ sub.article.get_absolute_url }}">{{ sub.article.title }}</a></p>
+    <div class="panel-body tags">
+        {% for tag in TAGS %}
+             <a href="/filter/tag/{{ tag.tag }}"><button type="button" class="btn btn-primary btn-md sidebar-tag">{{ tag.tag }}</button></a>
         {% endfor %}
     </div>
     <div class="panel-footer">
     </div>
 </div>
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Тэги</h4>
+<br>
+
+<div class="panel panel-default sidebar">
+    <div class="panel-heading sub-counter">
+        Подписки ( {{ SUBSCRIPTION_LIST|length }} )
     </div>
-    <div class="panel-body">
-        {% for tag in TAGS %}
-             <a href="/filter/tag/{{ tag.tag }}"><button type="button" class="btn btn-primary btn-md sidebar-tag">{{ tag.tag }}</button></a>
+    <div class="panel-body" id="subscription-list" hidden="true">
+        {% for sub in SUBSCRIPTION_LIST %}
+            <div class="subscription" data-pk="{{ sub.pk }}">
+                <a class="subscription-delete" href="/delete_subscription/{{ sub.pk }}/"><small><span class="glyphicon glyphicon-remove"></span></small></a>
+                <a href="{{ sub.article.get_absolute_url }}">{{ sub.article.title }}</a> ( {{ sub.new_comments }} )
+            </div>
         {% endfor %}
-    </div>
-    <div class="panel-footer">
     </div>
 </div>
