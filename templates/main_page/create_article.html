@@ -4,7 +4,16 @@
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% bootstrap_form article_form %}
+        {{ tag_form.management_form }}
+        <div id="tag-list">
+            {% for form in tag_form %}
+                <div class="tag-form">
+                    <span class="glyphicon glyphicon-remove delete-tag"></span>{{ form }}
+                </div>
+            {% endfor %}
+        </div>
         <button type="submit" class="btn btn-primary btn-md" >Сохранить</button>
     </form>
+        <button type="submit" class="btn btn-primary btn-md add-tag">Добавить тэг</button>
 {% endblock %}

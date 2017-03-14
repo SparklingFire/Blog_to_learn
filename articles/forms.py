@@ -1,19 +1,38 @@
 from django import forms
 from .models import Article
+from django.core.exceptions import ObjectDoesNotExist
 
 
-class ArticleForm(forms.ModelForm):
-
-    class Meta:
-        model = Article
-        fields = ('title', 'text', 'author')
+class ArticleForm(forms.Form):
+    title = forms.CharField()
+    text = forms.CharField(widget=forms.Textarea)
 
     def __init__(self, *args, **kwargs):
         try:
             self.article = kwargs.pop('article')
         except KeyError:
-            pass
+            self.article = None
         super().__init__(*args, **kwargs)
+
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        if len(title) < 5:
+            raise forms.ValidationError('The title is too short')
+        try:
+            Article.objects.get(title=title)
+            if self.article is not None:
+                pass
+            else:
+                raise forms.ValidationError('Статья с таким заголовком уже существует')
+        except ObjectDoesNotExist:
+            pass
+        return title
+
+    def clean_text(self):
+        text = self.cleaned_data.get('text')
+        if len(text) < 1:
+            raise forms.ValidationError('The text is too short')
+        return text
 
 
 class SearchForm(forms.Form):

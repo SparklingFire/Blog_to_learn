@@ -8,7 +8,7 @@ class Tag(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     edited = models.DateTimeField(auto_now_add=True, editable=False)
     tag = models.CharField(max_length=25)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ManyToManyField(settings.AUTH_USER_MODEL)
 
     @staticmethod
     def get_articles_by_tag(tag):

@@ -26,7 +26,7 @@ urlpatterns = [
     url('', include('custom_user.urls')),
     url('', include('rating.urls')),
     url('', include('registration.urls')),
-    url('', include('password.urls'))
+    url('', include('password.urls')),
 ]
 
 if settings.DEBUG is True:

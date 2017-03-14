@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from django.shortcuts import reverse
 from django.contrib.contenttypes.fields import GenericRelation
 from rating.models import RatingModel
+from django.db import IntegrityError
 
 
 class ArticleManager(models.Manager):
@@ -25,8 +26,8 @@ class Article(models.Model):
         """
         create a primary key for the article before saving the object
         """
-
-        self.primary_key = slugify(self.title)
+        if not self.primary_key:
+            self.primary_key = slugify(self.title)
         super().save(*args, **kwargs)
 
     def get_hits(self):

@@ -1,4 +1,4 @@
-from django.shortcuts import reverse, HttpResponseRedirect, Http404, get_object_or_404
+from django.shortcuts import reverse, HttpResponseRedirect, Http404, get_object_or_404, render, redirect
 from django.views import generic
 from .models import (Article, Subscription)
 from django.db.models import Q
@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .forms import ArticleForm
+from tag.forms import TagFormSet
 
 
 class ArticlesList(generic.ListView):
@@ -44,58 +45,6 @@ class ArticlesList(generic.ListView):
         if 'tag' in kwargs:
             self.tag = kwargs['tag']
 
-        return super().dispatch(request, *args, **kwargs)
-
-
-class CreateArticle(generic.FormView):
-    template_name = 'main_page/create_article.html'
-    article = None
-    form_class = ArticleForm
-
-    def get_success_url(self):
-        return reverse('article-details', args=[self.article.primary_key])
-
-    def form_invalid(self, form):
-        response = super().form_invalid(form)
-        if self.request.is_ajax():
-            data = {'error': form.errors}
-            return JsonResponse(data)
-        return response
-
-    def form_valid(self, form):
-        self.article = Article.objects.create(title=form.cleaned_data.get('title'),
-                                              text=form.cleaned_data.get('text'),
-                                              author=self.request.user)
-        return super().form_valid(form)
-
-
-class UpdateArticle(generic.FormView):
-    template_name = 'main_page/create_article.html'
-    form_class = ArticleForm
-    article = None
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['article'] = self.article
-        return kwargs
-
-    def get_initial(self):
-        initial = super().get_initial()
-        initial['title'] = self.article.title
-        initial['text'] = self.article.text
-        return initial
-
-    def get_success_url(self):
-        return reverse('article-details', args=[self.article.primary_key])
-
-    def form_valid(self, form):
-        self.article.text = form.cleaned_data.get('text')
-        self.article.title = form.cleaned_data.get('title')
-        self.article.save()
-        return super().form_valid(form)
-
-    def dispatch(self, request, *args, **kwargs):
-        self.article = Article.objects.get(primary_key=kwargs['article_pk'])
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -276,3 +225,70 @@ def delete_article(request, article_pk):
     except ObjectDoesNotExist:
         pass
     return HttpResponseRedirect('/')
+
+
+def create_article(request):
+    if request.method == 'POST':
+        article_form = ArticleForm(request.POST)
+        tag_form = TagFormSet(request.POST)
+
+        if article_form.is_valid() and tag_form.is_valid():
+            article = Article.objects.create(title=article_form.cleaned_data.get('title'),
+                                             text=article_form.cleaned_data.get('text'),
+                                             author=request.user)
+            article.save()
+
+            for tag in tag_form:
+                tag = Tag.objects.get_or_create(tag=tag.cleaned_data.get('tag'))[0]
+                tag.article.add(article)
+                tag.user.add(request.user)
+                tag.save()
+
+            return redirect(reverse('article-details', args=[article.primary_key]))
+    else:
+        article_form = ArticleForm()
+        tag_form = TagFormSet()
+    return render(request, 'main_page/create_article.html', {'article_form': article_form,
+                                                             'tag_form': tag_form
+                                                            }
+                )
+
+
+def update_article(request, pk):
+    article = Article.objects.get(primary_key=pk)
+
+    if request.method == 'POST':
+        article_form = ArticleForm(request.POST, article=article)
+        tag_form = TagFormSet(request.POST)
+
+        if article_form.is_valid() and tag_form.is_valid():
+            article.text = article_form.cleaned_data.get('text')
+            article.title = article_form.cleaned_data.get('title')
+            article.save()
+            old_tags = article.get_article_tags()
+
+            for tag in tag_form:
+                if tag.cleaned_data.get('tag') == '':
+                    continue
+                new_tag = Tag.objects.get_or_create(tag=tag.cleaned_data.get('tag'))[0]
+                if article not in new_tag.article.all():
+                    new_tag.article.add(article)
+                if request.user not in new_tag.user.all():
+                    new_tag.user.add(request.user)
+                new_tag.save()
+
+            for tag in [tag for tag in old_tags if tag not in article.get_article_tags()]:
+                tag.article.remove(article)
+                if tag.article.all().count() == 0:
+                    tag.delete()
+
+            return redirect(reverse('article-details', args=[article.primary_key]))
+
+    else:
+        article_form = ArticleForm(initial={'text': article.text,
+                                            'title': article.title,
+                                            'author': article.author})
+        tag_form = TagFormSet()
+
+    return render(request, 'main_page/create_article.html', {'article_form': article_form,
+                                                             'tag_form': tag_form})

@@ -58,7 +58,8 @@ body{
 
 .sidebar a:hover,
 .article-details a:hover,
-.parent-name:hover{
+.parent-name:hover,
+.delete-tag:hover{
     color: orange;
     cursor: pointer;
 }
