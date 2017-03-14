@@ -43,7 +43,11 @@ INSTALLED_APPS = [
     'rating',
     'hit',
     'utils_tags_cp',
-    'comments'
+    'comments',
+    'registration',
+    'bootstrap3',
+    'password',
+
 ]
 
 MIDDLEWARE = [
@@ -135,3 +139,4 @@ STATIC_ROOT = ''
 
 PROJECT_DIR = os.path.dirname(__file__)
 STATICFILES_DIRS = (os.path.join(PROJECT_DIR, "static"), )
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

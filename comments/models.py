@@ -13,7 +13,7 @@ class Comment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, editable=False)
     session = models.CharField(max_length=40, editable=False)
     ip = models.CharField(max_length=40, editable=False)
-    parent = models.OneToOneField('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent = models.ForeignKey('self', blank=True, null=True)
     name = models.TextField(editable=False)
     rating_object = GenericRelation(RatingModel)
 
@@ -30,3 +30,6 @@ class Comment(models.Model):
         super().save(*args, **kwargs)
         self.name = '#' + str(self.id)
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return 'Comment ID: {0}'.format(self.id)

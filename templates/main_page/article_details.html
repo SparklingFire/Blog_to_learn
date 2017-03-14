@@ -30,7 +30,13 @@
                 {% else %}
                     <a href="/subscribe/{{ article.primary_key }}">Подписаться</a>
                 {% endif %}
-                </div>
+             </div>
+             {% if user == article.author %}
+                    <div class="author-bar">
+                        <a href="/update_article/{{ article.pk }}/"><span class="glyphicon glyphicon-wrench"></span></a>
+                        <a href="/delete_article/{{ article.pk }}/"><span class="glyphicon glyphicon-remove"></span></a>
+                    </div>
+             {% endif %}
         </div>
     </div>
 
@@ -47,6 +53,9 @@
                 {% endif %}
             </div>
             <div class="panel-body">
+                {% if comment.parent %}
+                    <p class="parent-name">{{ comment.parent.name }}</p>
+                {% endif %}
                 <p>{{ comment.text }}</p>
             </div>
             <div class="panel-footer">
@@ -66,8 +75,8 @@
     <div id="errors-list"></div>
     <form action="" method="post" id="answer-form">
         {% csrf_token %}
-        {{ form.text }}
+        {{ form.as_p }}
             <br>
-        <button type="submit" class="btn btn-primary btn-sm answer-submit">Ответить</button>
+        <button type="submit" class="btn btn-primary btn-md answer-submit">Ответить</button>
     </form>
 {% endblock %}

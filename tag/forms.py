@@ -17,5 +17,5 @@ class BaseTagFormSet(BaseInlineFormSet):
             if len(tag.tag) < 2:
                 raise forms.ValidationError('The tag is too short')
 
-            if re.match('[-\w ]+', tag.tag):
-                raise forms.ValidationError('Tag may contain only letters')
+formset = BaseTagFormSet()
+TagFormSet = formset_factory(formset)

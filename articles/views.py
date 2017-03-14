@@ -12,7 +12,7 @@ from utils_tags_cp.utils import get_ip
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-import pytz
+from .forms import ArticleForm
 
 
 class ArticlesList(generic.ListView):
@@ -44,6 +44,58 @@ class ArticlesList(generic.ListView):
         if 'tag' in kwargs:
             self.tag = kwargs['tag']
 
+        return super().dispatch(request, *args, **kwargs)
+
+
+class CreateArticle(generic.FormView):
+    template_name = 'main_page/create_article.html'
+    article = None
+    form_class = ArticleForm
+
+    def get_success_url(self):
+        return reverse('article-details', args=[self.article.primary_key])
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        if self.request.is_ajax():
+            data = {'error': form.errors}
+            return JsonResponse(data)
+        return response
+
+    def form_valid(self, form):
+        self.article = Article.objects.create(title=form.cleaned_data.get('title'),
+                                              text=form.cleaned_data.get('text'),
+                                              author=self.request.user)
+        return super().form_valid(form)
+
+
+class UpdateArticle(generic.FormView):
+    template_name = 'main_page/create_article.html'
+    form_class = ArticleForm
+    article = None
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['article'] = self.article
+        return kwargs
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial['title'] = self.article.title
+        initial['text'] = self.article.text
+        return initial
+
+    def get_success_url(self):
+        return reverse('article-details', args=[self.article.primary_key])
+
+    def form_valid(self, form):
+        self.article.text = form.cleaned_data.get('text')
+        self.article.title = form.cleaned_data.get('title')
+        self.article.save()
+        return super().form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.article = Article.objects.get(primary_key=kwargs['article_pk'])
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -88,11 +140,15 @@ class ArticleDetails(generic.FormView):
                     'comment_name': comment.name,
                     'datetime': timezone.now(),
                     'auth_user': False,
-                    'comment_pk': comment.id
+                    'comment_pk': comment.id,
+                    'parent': None
                     }
 
             if self.request.user.is_authenticated():
                 data.update({'auth_user': True})
+
+            if parent:
+                data.update({'parent': comment.parent.name})
 
             return JsonResponse(data)
         response = super().form_valid(form)
@@ -186,11 +242,16 @@ class SubscriptionRefresher(generic.RedirectView):
 
 @login_required
 def delete_comment(request, pk):
-    comment = Comment.objects.get(pk=pk)
+    try:
+        comment = Comment.objects.get(pk=pk)
+    except ObjectDoesNotExist:
+        if request.is_ajax():
+            return JsonResponse({'message': 'Сообщение не существует'})
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     url = comment.article.get_absolute_url()
     comment.delete()
     if request.is_ajax():
-        return JsonResponse({})
+        return JsonResponse({'message': 'Сообщение удалено'})
     return HttpResponseRedirect(url)
 
 
@@ -206,3 +267,12 @@ def delete_subscription(request, pk):
         return JsonResponse(data)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required
+def delete_article(request, article_pk):
+    try:
+        Article.objects.get(pk=article_pk).delete()
+    except ObjectDoesNotExist:
+        pass
+    return HttpResponseRedirect('/')

@@ -21,13 +21,11 @@ $(document).ready(function (e) {
                     else{
                         var date = new Date(response.datetime);
 
-                        var panel_default = $('<div class="panel panel-default article-details" data-id=' +
+                        var panel_default = $('<div class="panel panel-default article-details" id=' +
                                                 response.comment_pk + '></div>');
 
                         var panel_heading = $('<div class="panel-heading" data-id=' + response.rating_model_pk + '>Аноним ' +
                                                response.comment_name + ' ' +  date.toLocaleString() + '</div>');
-
-                        var panel_body = $('<div class="panel-body">' + response.comment_text + '</div>');
 
                         var panel_footer = $('<div class="panel-footer">' +
                                              '<a href="/rate/' + response.rating_model_pk + '/like/">' +
@@ -45,6 +43,14 @@ $(document).ready(function (e) {
                                                     response.comment_pk +
                                                    '"><span class="glyphicon glyphicon-remove"></span></a></div>');
                             panel_heading.append(delete_comment);
+                        }
+
+                        if (response.parent === null){
+                            var panel_body = ($('<div class="panel-body"><p>' + response.comment_text + '</p></div>'));
+                        }
+                        else{
+                            var panel_body = ($('<div class="panel-body"><p class="parent-name">' + response.parent + '</p>' +
+                                                '<p>' + response.comment_text + '</p></div>'));
                         }
 
                         var new_comment = panel_default.append(panel_heading)
@@ -76,13 +82,14 @@ $(document).ready(function (e) {
                 error: function (xhr, errmsg, err) {
                     alert(xhr.status + ": " + xhr.responseText);
                     }
-        })
+            })
     });
 
     $(document).on('click', '.comment-answer', function (e) {
         e.preventDefault();
-        var new_form = $('#answer-form').clone(true).appendTo($(this).parent());
+        var new_form = $('#answer-form').clone(true);
         new_form.find('.parent').val($(this).parent().attr('id'));
+        new_form.appendTo($(this).parent());
         $(this).attr('class', 'comment-answer-close');
         $(this).html('Закрыть');
     });
@@ -92,5 +99,12 @@ $(document).ready(function (e) {
         $(this).attr('class', 'comment-answer');
         $(this).html('Ответить');
         $(this).parent().find('#answer-form').remove();
+    });
+
+    $(document).on('click', '.parent-name', function (e) {
+        e.preventDefault();
+        var name = $(this).html();
+        var target_comment = $("div:contains("+ name + ")");
+        $('body, html').animate({ scrollTop: $(target_comment).offset().top }, 1000);
     })
 });

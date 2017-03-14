@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (RatingModel, Vote)
+from .models import (RatingModel, Vote, UserRatingModel)
 
 
 class ArticleRatingModelExtension(admin.ModelAdmin):
@@ -12,3 +12,4 @@ class VoteExtension(admin.ModelAdmin):
 
 admin.site.register(RatingModel, ArticleRatingModelExtension)
 admin.site.register(Vote, VoteExtension)
+admin.site.register(UserRatingModel)

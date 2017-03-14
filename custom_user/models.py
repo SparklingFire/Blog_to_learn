@@ -3,6 +3,7 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 from django.utils import timezone
+from articles.models import Subscription, Article
 
 
 class CustomUserManager(BaseUserManager):
@@ -66,3 +67,40 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+    def get_user_rating_object(self):
+        return self.userratingmodel
+
+    def get_subscription_articles(self):
+        articles = []
+        for s in self.get_subscriptions():
+            articles.append(s.article)
+        return articles
+
+    def update_subscriptions(self):
+        for sub in self.get_subscriptions():
+            sub.get_updates()
+
+    def get_subscriptions(self):
+        return Subscription.objects.filter(subscribed_user=self)
+
+    def get_user_articles(self):
+        from articles.models import Article
+        return Article.objects.filter(author=self)
+
+    def get_user_comments(self):
+        from comments.models import Comment
+        return Comment.objects.filter(user=self)
+
+    def get_user_tag(self):
+        from tag.models import Tag
+        return Tag.objects.filter(user=self)
+
+    def get_user_rating(self):
+        return self.get_user_rating_object().score
+
+    def get_user_likes(self):
+        return self.get_user_rating_object().likes
+
+    def get_user_dislikes(self):
+        return self.get_user_rating_object().dislikes

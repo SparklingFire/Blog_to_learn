@@ -1,0 +1,39 @@
+{% extends 'main_page/static_templates/main_page_carcass.html' %}
+
+
+{% block content %}
+    <div class="row">
+    <div class="col-sm-8">
+        <div class="panel panel-default user-info">
+            <div class="panel-heading ">
+                <h3>Здравствуйте, {{ user.username }}</h3>
+                <p>Рейтинг: {{ user.get_user_rating }}</p>
+                <p>Лайки: {{ user.get_user_likes }} Дислайки: {{ user.get_user_dislikes }}</p>
+            </div>
+            <div class="panel-footer">
+                <a href="/password_change/">Смена пароля</a>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="panel panel-default user-info">
+            <div class="panel-body">
+                <h4>Последние комментарии пользователя:</h4>
+                {% for comment in user.get_previous_comments %}
+                    <p><a href="{{ comment.get_absolute_url }}">{{ comment.sidebar_info }}</a></p>
+                {% endfor %}
+
+                <br>
+
+
+                <h4>Последние темы пользователя:</h4>
+                {% for article in user.get_previous_articles %}
+                    <p><a href="{{ article.get_absolute_url }}">{{ article.sidebar_info }}</a> </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

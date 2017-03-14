@@ -1,5 +1,6 @@
 from django.db import models
 from articles.models import Article
+from django.conf import settings
 
 
 class Tag(models.Model):
@@ -7,6 +8,7 @@ class Tag(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     edited = models.DateTimeField(auto_now_add=True, editable=False)
     tag = models.CharField(max_length=25)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     @staticmethod
     def get_articles_by_tag(tag):

@@ -9,7 +9,7 @@ from rating.models import RatingModel
 
 class ArticleManager(models.Manager):
     def get_popular_articles(self):
-        return Article.objects.all().order_by('hitcount__hits')
+        return Article.objects.all().order_by('hitcount__hits').reverse()
 
 
 class Article(models.Model):
@@ -41,6 +41,9 @@ class Article(models.Model):
     def get_rating_model_pk(self):
         return self.rating_object.last().pk
 
+    def get_rating_model(self):
+        return RatingModel.objects.get(pk=self.get_rating_model_pk())
+
     def get_article_tags(self):
         return self.tag_set.all()
 
@@ -52,6 +55,7 @@ class Article(models.Model):
 
 class Subscription(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    subscribed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     session = models.CharField(max_length=40, editable=False)
     ip = models.CharField(max_length=40, editable=False)
     new_comments = models.SmallIntegerField(default=0)

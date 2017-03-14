@@ -38,4 +38,16 @@ urlpatterns = [
     url(regex='^delete_subscription/(?P<pk>[0-9]+)/$',
         view=views.delete_subscription,
         name='delete-subscription'),
+
+    url(regex='^create_article/$',
+        view=views.CreateArticle.as_view(),
+        name='create-article'),
+
+    url(regex='^update_article/(?P<article_pk>[-\w ]+)/$',
+        view=views.UpdateArticle.as_view(),
+        name='update-article'),
+
+    url(regex='^delete_article/(?P<article_pk>[-\w ]+)/$',
+        view=views.delete_article,
+        name='article-delete')
 ]

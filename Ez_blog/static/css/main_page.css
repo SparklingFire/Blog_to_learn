@@ -57,12 +57,19 @@ body{
 }
 
 .sidebar a:hover,
-.article-details a:hover{
+.article-details a:hover,
+.parent-name:hover{
     color: orange;
+    cursor: pointer;
 }
 
 .sub-counter{
     cursor: pointer;
+}
+
+.panel-default .panel-heading,
+.panel-default .panel-body{
+    word-wrap: break-word;
 }
 
 .sidebar .panel-heading{
@@ -73,7 +80,8 @@ body{
     border: none;
 }
 
-.sidebar-tag{
+.sidebar-tag,
+.btn-md{
     background-color: white;
     border-radius: 0;
     border-color: black;
@@ -84,7 +92,12 @@ body{
 .sidebar-tag:active,
 .sidebar-tag:visited,
 .sidebar-tag:focus,
-.sidebar-tag:active:focus{
+.sidebar-tag:active:focus,
+.btn-md:active:focus,
+.btn-md:hover,
+.btn-md:active,
+.btn-md:visited,
+.btn-md:focus{
     background-color: orange;
     color: white;
 }

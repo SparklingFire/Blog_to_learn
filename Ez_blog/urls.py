@@ -24,7 +24,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url('', include('articles.urls')),
     url('', include('custom_user.urls')),
-    url('', include('rating.urls'))
+    url('', include('rating.urls')),
+    url('', include('registration.urls')),
+    url('', include('password.urls'))
 ]
 
 if settings.DEBUG is True:

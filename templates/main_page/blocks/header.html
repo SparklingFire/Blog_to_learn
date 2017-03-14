@@ -8,9 +8,18 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
-                <li><a href='/'>Home</a></li>
-                <li><a href="/site_info/">Info</a></li>
-                <li><a href="/contacts/">Contacts</a></li>
+                <li><a href='/'>Главная</a></li>
+                <li><a href="/site_info/">Информация</a></li>
+                <li><a href="/contacts/">Контакты</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="/create_article/">Создать пост</a></li>
+                    <li><a href="/{{ user.username }}/user_info">Личный кабинет</a></li>
+                    <li><a href="/logout/">Выйти</a></li>
+                    </ul>
+                    {% else %}
+                    <li><a href="/registration/">Регистрация</a></li>
+                    <li><a href="/login/">Войти</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
